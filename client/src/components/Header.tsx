@@ -22,9 +22,9 @@ export default function Header({
 
   const navItems = [
     { label: "Services", href: "/services" },
-    { label: "Our Team", href: "/#team" },
-    { label: "Gallery", href: "/#gallery" },
-    { label: "Contact", href: "/#contact" }
+    { label: "Our Team", href: "/team" },
+    { label: "Gallery", href: "/gallery" },
+    { label: "Contact", href: "/contact" }
   ];
 
   const [location] = useLocation();
@@ -46,29 +46,11 @@ export default function Header({
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
-              item.href.startsWith("/#") ? (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-white/80 hover:text-white transition-colors"
-                  onClick={(e) => {
-                    if (location !== "/") {
-                      return; // Let default behavior handle cross-page navigation
-                    }
-                    e.preventDefault();
-                    const targetId = item.href.replace("/#", "");
-                    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
+              <Link key={item.label} href={item.href}>
+                <span className="text-white/80 hover:text-white transition-colors cursor-pointer">
                   {item.label}
-                </a>
-              ) : (
-                <Link key={item.label} href={item.href}>
-                  <span className="text-white/80 hover:text-white transition-colors cursor-pointer">
-                    {item.label}
-                  </span>
-                </Link>
-              )
+                </span>
+              </Link>
             ))}
           </nav>
 
@@ -134,34 +116,14 @@ export default function Header({
           <div className="md:hidden mt-4 pt-4 border-t border-white/20">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
-                item.href.startsWith("/#") ? (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="text-white/80 hover:text-white transition-colors"
-                    onClick={(e) => {
-                      if (location !== "/") {
-                        setMobileMenuOpen(false);
-                        return; // Let default behavior handle cross-page navigation
-                      }
-                      e.preventDefault();
-                      const targetId = item.href.replace("/#", "");
-                      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-                      setMobileMenuOpen(false);
-                    }}
+                <Link key={item.label} href={item.href}>
+                  <span 
+                    className="text-white/80 hover:text-white transition-colors cursor-pointer"
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}
-                  </a>
-                ) : (
-                  <Link key={item.label} href={item.href}>
-                    <span 
-                      className="text-white/80 hover:text-white transition-colors cursor-pointer"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.label}
-                    </span>
-                  </Link>
-                )
+                  </span>
+                </Link>
               ))}
               {!isAuthenticated && (
                 <Button 
