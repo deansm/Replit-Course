@@ -1,6 +1,7 @@
 import { Scissors, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import ThemeToggle from "./ThemeToggle";
 import GlassCard from "./GlassCard";
 
@@ -20,38 +21,54 @@ export default function Header({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { label: "Services", href: "#services" },
-    { label: "Our Team", href: "#team" },
-    { label: "Gallery", href: "#gallery" },
-    { label: "Contact", href: "#contact" }
+    { label: "Services", href: "/services" },
+    { label: "Our Team", href: "/#team" },
+    { label: "Gallery", href: "/#gallery" },
+    { label: "Contact", href: "/#contact" }
   ];
+
+  const [location] = useLocation();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 p-4">
       <GlassCard intensity="heavy" className="px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Scissors className="h-6 w-6 text-white" />
+          <Link href="/">
+            <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Scissors className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xl font-bold text-white">Luxe Hair Studio</span>
             </div>
-            <span className="text-xl font-bold text-white">Luxe Hair Studio</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-white/80 hover:text-white transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log(`Navigating to ${item.label}`);
-                }}
-              >
-                {item.label}
-              </a>
+              item.href.startsWith("/#") ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-white/80 hover:text-white transition-colors"
+                  onClick={(e) => {
+                    if (location !== "/") {
+                      return; // Let default behavior handle cross-page navigation
+                    }
+                    e.preventDefault();
+                    const targetId = item.href.replace("/#", "");
+                    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link key={item.label} href={item.href}>
+                  <span className="text-white/80 hover:text-white transition-colors cursor-pointer">
+                    {item.label}
+                  </span>
+                </Link>
+              )
             ))}
           </nav>
 
@@ -117,18 +134,34 @@ export default function Header({
           <div className="md:hidden mt-4 pt-4 border-t border-white/20">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-white/80 hover:text-white transition-colors"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log(`Mobile nav: ${item.label}`);
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  {item.label}
-                </a>
+                item.href.startsWith("/#") ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-white/80 hover:text-white transition-colors"
+                    onClick={(e) => {
+                      if (location !== "/") {
+                        setMobileMenuOpen(false);
+                        return; // Let default behavior handle cross-page navigation
+                      }
+                      e.preventDefault();
+                      const targetId = item.href.replace("/#", "");
+                      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link key={item.label} href={item.href}>
+                    <span 
+                      className="text-white/80 hover:text-white transition-colors cursor-pointer"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                )
               ))}
               {!isAuthenticated && (
                 <Button 
