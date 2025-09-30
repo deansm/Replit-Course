@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import GlassCard from "./GlassCard";
 
 interface BookingFormProps {
@@ -21,6 +23,8 @@ export default function BookingForm({ onSubmit }: BookingFormProps) {
     time: "",
     notes: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const services = [
     "Hair Cut & Style - $65",
@@ -35,10 +39,57 @@ export default function BookingForm({ onSubmit }: BookingFormProps) {
     "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Booking submitted:", formData);
-    onSubmit?.(formData);
+    setIsSubmitting(true);
+
+    try {
+      const appointmentData = {
+        ...formData,
+        userId: null, // Will be set when auth is properly implemented
+        status: "pending"
+      };
+
+      const response = await apiRequest("POST", "/api/appointments", appointmentData);
+
+      if (response.ok) {
+        const appointment = await response.json();
+        console.log("Appointment created:", appointment);
+        
+        // Invalidate appointments cache
+        await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+        
+        toast({
+          title: "Appointment Booked!",
+          description: `Your appointment for ${formData.service} on ${formData.date} at ${formData.time} has been confirmed.`,
+        });
+
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          service: "",
+          date: "",
+          time: "",
+          notes: ""
+        });
+
+        onSubmit?.(appointment);
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to book appointment");
+      }
+    } catch (error: any) {
+      console.error("Error booking appointment:", error);
+      toast({
+        title: "Booking Failed",
+        description: error.message || "Failed to book appointment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -144,10 +195,11 @@ export default function BookingForm({ onSubmit }: BookingFormProps) {
 
         <Button 
           type="submit" 
+          disabled={isSubmitting}
           className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 font-semibold"
           data-testid="button-submit-booking"
         >
-          Book Appointment
+          {isSubmitting ? "Booking..." : "Book Appointment"}
         </Button>
       </form>
     </GlassCard>
