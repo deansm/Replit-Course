@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import TeamMember from "@/components/TeamMember";
 import BookingForm from "@/components/BookingForm";
@@ -10,12 +11,11 @@ import femaleStyleImage from '@assets/generated_images/Hair_stylist_profile_phot
 import maleStyleImage from '@assets/generated_images/Male_hair_stylist_photo_98c51867.png';
 
 export default function Team() {
+  const { isAuthenticated, userName, login, signup, logout } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState("");
 
   const teamMembers = [
     {
@@ -69,18 +69,12 @@ export default function Team() {
   ];
 
   const handleLogin = (email: string, password: string) => {
-    // todo: remove mock functionality
-    console.log("Login attempt:", email);
-    setIsAuthenticated(true);
-    setUserName(email.split('@')[0]);
+    login(email, password);
     setShowLogin(false);
   };
 
   const handleSignup = (email: string, password: string, name: string) => {
-    // todo: remove mock functionality
-    console.log("Signup attempt:", email, name);
-    setIsAuthenticated(true);
-    setUserName(name);
+    signup(email, password, name);
     setShowLogin(false);
   };
 
@@ -97,6 +91,7 @@ export default function Team() {
         onBookingClick={() => setShowBooking(true)}
         isAuthenticated={isAuthenticated}
         userName={userName}
+        onLogout={logout}
       />
       
       {/* Hero Section */}

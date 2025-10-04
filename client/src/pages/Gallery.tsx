@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import LoginForm from "@/components/LoginForm";
 import BookingForm from "@/components/BookingForm";
@@ -7,10 +8,9 @@ import { Camera, Heart, Eye, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Gallery() {
+  const { isAuthenticated, userName, login, signup, logout } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const categories = [
@@ -102,18 +102,12 @@ export default function Gallery() {
     : galleryItems.filter(item => item.category === selectedCategory);
 
   const handleLogin = (email: string, password: string) => {
-    // todo: remove mock functionality
-    console.log("Login attempt:", email);
-    setIsAuthenticated(true);
-    setUserName(email.split('@')[0]);
+    login(email, password);
     setShowLogin(false);
   };
 
   const handleSignup = (email: string, password: string, name: string) => {
-    // todo: remove mock functionality
-    console.log("Signup attempt:", email, name);
-    setIsAuthenticated(true);
-    setUserName(name);
+    signup(email, password, name);
     setShowLogin(false);
   };
 
@@ -129,6 +123,7 @@ export default function Gallery() {
         onBookingClick={() => setShowBooking(true)}
         isAuthenticated={isAuthenticated}
         userName={userName}
+        onLogout={logout}
       />
       
       {/* Hero Section */}

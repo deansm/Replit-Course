@@ -10,13 +10,15 @@ interface HeaderProps {
   onBookingClick?: () => void;
   isAuthenticated?: boolean;
   userName?: string;
+  onLogout?: () => void;
 }
 
 export default function Header({ 
   onLoginClick, 
   onBookingClick, 
   isAuthenticated = false,
-  userName 
+  userName,
+  onLogout
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -64,7 +66,7 @@ export default function Header({
                 <span className="text-white/80 hidden sm:block">Welcome, {userName}</span>
                 <Button 
                   onClick={() => {
-                    console.log("Logout clicked");
+                    onLogout?.();
                   }}
                   variant="ghost"
                   className="bg-white/10 hover:bg-white/20 text-white border border-white/30"

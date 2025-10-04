@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import LoginForm from "@/components/LoginForm";
 import GlassCard from "@/components/GlassCard";
@@ -7,9 +8,8 @@ import { Calendar, Clock, Mail, Phone, FileText, CheckCircle, XCircle, AlertCirc
 import { Appointment } from "@shared/schema";
 
 export default function Appointments() {
+  const { isAuthenticated, userName, login, signup, logout } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState("");
 
   const { data: appointments, isLoading } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments"],
@@ -17,18 +17,12 @@ export default function Appointments() {
   });
 
   const handleLogin = (email: string, password: string) => {
-    // todo: remove mock functionality
-    console.log("Login attempt:", email);
-    setIsAuthenticated(true);
-    setUserName(email.split('@')[0]);
+    login(email, password);
     setShowLogin(false);
   };
 
   const handleSignup = (email: string, password: string, name: string) => {
-    // todo: remove mock functionality
-    console.log("Signup attempt:", email, name);
-    setIsAuthenticated(true);
-    setUserName(name);
+    signup(email, password, name);
     setShowLogin(false);
   };
 
@@ -67,6 +61,7 @@ export default function Appointments() {
         onBookingClick={() => {}}
         isAuthenticated={isAuthenticated}
         userName={userName}
+        onLogout={logout}
       />
       
       {/* Hero Section */}

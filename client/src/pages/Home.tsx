@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ServiceCard from "@/components/ServiceCard";
@@ -7,17 +8,17 @@ import BookingForm from "@/components/BookingForm";
 import LoginForm from "@/components/LoginForm";
 import PaymentForm from "@/components/PaymentForm";
 import GlassCard from "@/components/GlassCard";
+import { Button } from "@/components/ui/button";
 import { Sparkles, Award, Clock, Shield } from "lucide-react";
 import femaleStyleImage from '@assets/generated_images/Hair_stylist_profile_photo_979d5f1b.png';
 import maleStyleImage from '@assets/generated_images/Male_hair_stylist_photo_98c51867.png';
 
 export default function Home() {
+  const { isAuthenticated, userName, login, signup, logout } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState("");
 
   const services = [
     {
@@ -109,18 +110,12 @@ export default function Home() {
   ];
 
   const handleLogin = (email: string, password: string) => {
-    // todo: remove mock functionality
-    console.log("Login attempt:", email);
-    setIsAuthenticated(true);
-    setUserName(email.split('@')[0]);
+    login(email, password);
     setShowLogin(false);
   };
 
   const handleSignup = (email: string, password: string, name: string) => {
-    // todo: remove mock functionality
-    console.log("Signup attempt:", email, name);
-    setIsAuthenticated(true);
-    setUserName(name);
+    signup(email, password, name);
     setShowLogin(false);
   };
 
@@ -154,6 +149,7 @@ export default function Home() {
         onBookingClick={() => setShowBooking(true)}
         isAuthenticated={isAuthenticated}
         userName={userName}
+        onLogout={logout}
       />
       
       <HeroSection 
@@ -162,6 +158,29 @@ export default function Home() {
           document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
         }}
       />
+
+      {/* Welcome Section */}
+      {isAuthenticated && (
+        <section className="py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <GlassCard intensity="medium" className="p-8 text-center">
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Welcome back, {userName}!
+              </h2>
+              <p className="text-white/80 text-lg mb-6">
+                We're delighted to have you at Luxe Hair Studio. Ready to book your next appointment?
+              </p>
+              <Button 
+                onClick={() => setShowBooking(true)}
+                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-semibold"
+                data-testid="button-welcome-book"
+              >
+                Book Now
+              </Button>
+            </GlassCard>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-20 px-4">

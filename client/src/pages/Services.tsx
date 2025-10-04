@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import ServiceCard from "@/components/ServiceCard";
 import BookingForm from "@/components/BookingForm";
@@ -8,12 +9,11 @@ import GlassCard from "@/components/GlassCard";
 import { Scissors, Clock, DollarSign } from "lucide-react";
 
 export default function Services() {
+  const { isAuthenticated, userName, login, signup, logout } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState("");
 
   const services = [
     {
@@ -73,18 +73,12 @@ export default function Services() {
   ];
 
   const handleLogin = (email: string, password: string) => {
-    // todo: remove mock functionality
-    console.log("Login attempt:", email);
-    setIsAuthenticated(true);
-    setUserName(email.split('@')[0]);
+    login(email, password);
     setShowLogin(false);
   };
 
   const handleSignup = (email: string, password: string, name: string) => {
-    // todo: remove mock functionality
-    console.log("Signup attempt:", email, name);
-    setIsAuthenticated(true);
-    setUserName(name);
+    signup(email, password, name);
     setShowLogin(false);
   };
 
@@ -118,6 +112,7 @@ export default function Services() {
         onBookingClick={() => setShowBooking(true)}
         isAuthenticated={isAuthenticated}
         userName={userName}
+        onLogout={logout}
       />
       
       {/* Hero Section */}
